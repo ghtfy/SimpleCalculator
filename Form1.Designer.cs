@@ -51,6 +51,8 @@
             this.btnPlusMinus = new System.Windows.Forms.Button();
             this.btnNum0 = new System.Windows.Forms.Button();
             this.btnDot = new System.Windows.Forms.Button();
+            this.btnOpenParen = new System.Windows.Forms.Button();
+            this.btnCloseParen = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtinput
@@ -307,11 +309,35 @@
             this.btnDot.Text = ".";
             this.btnDot.UseVisualStyleBackColor = false;
             // 
+            // btnOpenParen
+            // 
+            this.btnOpenParen.BackColor = System.Drawing.Color.LightSkyBlue;
+            this.btnOpenParen.Font = new System.Drawing.Font("굴림", 14F);
+            this.btnOpenParen.Location = new System.Drawing.Point(20, 454);
+            this.btnOpenParen.Name = "btnOpenParen";
+            this.btnOpenParen.Size = new System.Drawing.Size(80, 48);
+            this.btnOpenParen.TabIndex = 24;
+            this.btnOpenParen.Text = "(";
+            this.btnOpenParen.UseVisualStyleBackColor = false;
+            // 
+            // btnCloseParen
+            // 
+            this.btnCloseParen.BackColor = System.Drawing.Color.LightSkyBlue;
+            this.btnCloseParen.Font = new System.Drawing.Font("굴림", 14F);
+            this.btnCloseParen.Location = new System.Drawing.Point(106, 454);
+            this.btnCloseParen.Name = "btnCloseParen";
+            this.btnCloseParen.Size = new System.Drawing.Size(80, 48);
+            this.btnCloseParen.TabIndex = 25;
+            this.btnCloseParen.Text = ")";
+            this.btnCloseParen.UseVisualStyleBackColor = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(390, 470);
+            this.ClientSize = new System.Drawing.Size(390, 520);
+            this.Controls.Add(this.btnCloseParen);
+            this.Controls.Add(this.btnOpenParen);
             this.Controls.Add(this.btnDot);
             this.Controls.Add(this.btnNum0);
             this.Controls.Add(this.btnPlusMinus);
@@ -368,6 +394,8 @@
         private System.Windows.Forms.Button btnPlusMinus;
         private System.Windows.Forms.Button btnNum0;
         private System.Windows.Forms.Button btnDot;
+        private System.Windows.Forms.Button btnOpenParen;
+        private System.Windows.Forms.Button btnCloseParen;
     }
 }
 

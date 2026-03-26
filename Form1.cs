@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Windows.Forms;
 
 namespace SimpleCalculator
@@ -9,13 +11,11 @@ namespace SimpleCalculator
         private const int MaxDigitCount = 16;
 
         private readonly Random random = new Random();
-        private int equalsClickCount;
+        private readonly List<string> expressionTokens = new List<string>();
 
-        private double firstOperand;
-        private char currentOperator = '\0';
-        private bool hasFirstOperand;
+        private int equalsClickCount;
         private bool isResultDisplayed;
-        private bool isSecondOperandStarted;
+        private bool isAwaitingNextValue;
 
         public Form1()
         {
@@ -44,6 +44,9 @@ namespace SimpleCalculator
             btnMultiply.Click += OperatorButton_Click;
             btnDivide.Click += OperatorButton_Click;
 
+            btnOpenParen.Click += btnOpenParen_Click;
+            btnCloseParen.Click += btnCloseParen_Click;
+
             btnDot.Click += btnDot_Click;
             btnPlusMinus.Click += btnPlusMinus_Click;
             btnDel.Click += btnDel_Click;
@@ -56,7 +59,7 @@ namespace SimpleCalculator
         {
             ResetEqualsClickCount();
 
-            Button button = sender as Button;
+            var button = sender as Button;
             if (button == null)
             {
                 return;
@@ -70,44 +73,132 @@ namespace SimpleCalculator
         {
             ResetEqualsClickCount();
 
-            Button button = sender as Button;
+            var button = sender as Button;
             if (button == null)
             {
                 return;
             }
 
-            double value;
-            if (!TryParseNumber(txtinput.Text, out value))
-            {
-                MessageBox.Show("숫자를 입력하세요.");
-                return;
-            }
-
-            firstOperand = value;
-            hasFirstOperand = true;
-            isResultDisplayed = false;
-
+            char op;
             switch (button.Text)
             {
                 case "+":
-                    currentOperator = '+';
+                    op = '+';
                     break;
                 case "-":
-                    currentOperator = '-';
+                    op = '-';
                     break;
                 case "x":
-                    currentOperator = '*';
+                    op = '*';
                     break;
                 case "÷":
-                    currentOperator = '/';
+                    op = '/';
                     break;
                 default:
-                    currentOperator = '\0';
-                    break;
+                    return;
+            }
+
+            if (isResultDisplayed)
+            {
+                isResultDisplayed = false;
+            }
+
+            if (!isAwaitingNextValue)
+            {
+                if (!AppendCurrentInputToken())
+                {
+                    MessageBox.Show("숫자를 입력하세요.");
+                    return;
+                }
+            }
+
+            if (expressionTokens.Count == 0)
+            {
+                return;
+            }
+
+            if (IsOperatorToken(expressionTokens[expressionTokens.Count - 1]))
+            {
+                expressionTokens[expressionTokens.Count - 1] = op.ToString();
+            }
+            else if (expressionTokens[expressionTokens.Count - 1] != "(")
+            {
+                expressionTokens.Add(op.ToString());
             }
 
             txtinput.Text = "0";
-            isSecondOperandStarted = false;
+            isAwaitingNextValue = true;
+            UpdateExpressionDisplay();
+        }
+
+        private void btnOpenParen_Click(object sender, EventArgs e)
+        {
+            ResetEqualsClickCount();
+
+            if (isResultDisplayed)
+            {
+                expressionTokens.Clear();
+                txtinput.Text = "0";
+                isResultDisplayed = false;
+                isAwaitingNextValue = false;
+            }
+
+            if (!isAwaitingNextValue)
+            {
+                if (txtinput.Text != "0")
+                {
+                    if (!AppendCurrentInputToken())
+                    {
+                        MessageBox.Show("숫자를 입력하세요.");
+                        return;
+                    }
+
+                    expressionTokens.Add("*");
+                }
+            }
+            else if (expressionTokens.Count > 0 && expressionTokens[expressionTokens.Count - 1] == ")")
+            {
+                expressionTokens.Add("*");
+            }
+
+            expressionTokens.Add("(");
+            txtinput.Text = "0";
+            isAwaitingNextValue = true;
+            UpdateExpressionDisplay();
+        }
+
+        private void btnCloseParen_Click(object sender, EventArgs e)
+        {
+            ResetEqualsClickCount();
+
+            if (CountOpenParentheses() <= 0)
+            {
+                return;
+            }
+
+            if (!isAwaitingNextValue)
+            {
+                if (!AppendCurrentInputToken())
+                {
+                    MessageBox.Show("숫자를 입력하세요.");
+                    return;
+                }
+            }
+
+            if (expressionTokens.Count == 0)
+            {
+                return;
+            }
+
+            string last = expressionTokens[expressionTokens.Count - 1];
+            if (IsOperatorToken(last) || last == "(")
+            {
+                return;
+            }
+
+            expressionTokens.Add(")");
+            txtinput.Text = "0";
+            isAwaitingNextValue = true;
             UpdateExpressionDisplay();
         }
 
@@ -122,52 +213,50 @@ namespace SimpleCalculator
                 MessageBox.Show(string.Format("랜덤 숫자: {0}", randomNumber));
 
                 equalsClickCount = 0;
-                hasFirstOperand = false;
-                currentOperator = '\0';
+                expressionTokens.Clear();
                 isResultDisplayed = true;
-                isSecondOperandStarted = false;
+                isAwaitingNextValue = false;
                 return;
             }
 
-            if (!hasFirstOperand || currentOperator == '\0')
+            List<string> tokensToEvaluate = new List<string>(expressionTokens);
+            if (!isAwaitingNextValue)
+            {
+                double currentNumber;
+                if (!TryParseNumber(txtinput.Text, out currentNumber))
+                {
+                    MessageBox.Show("숫자를 입력하세요.");
+                    return;
+                }
+
+                tokensToEvaluate.Add(FormatNumber(currentNumber));
+            }
+
+            if (tokensToEvaluate.Count == 0)
             {
                 return;
             }
 
-            double secondOperand;
-            if (!TryParseNumber(txtinput.Text, out secondOperand))
+            if (IsOperatorToken(tokensToEvaluate[tokensToEvaluate.Count - 1]))
             {
-                MessageBox.Show("숫자를 입력하세요.");
+                return;
+            }
+
+            if (CountOpenParentheses(tokensToEvaluate) != 0)
+            {
+                MessageBox.Show("괄호가 올바르지 않습니다.");
                 return;
             }
 
             double result;
-            switch (currentOperator)
+            if (!EvaluateTokens(tokensToEvaluate, out result))
             {
-                case '+':
-                    result = firstOperand + secondOperand;
-                    break;
-                case '-':
-                    result = firstOperand - secondOperand;
-                    break;
-                case '*':
-                    result = firstOperand * secondOperand;
-                    break;
-                case '/':
-                    if (secondOperand == 0)
-                    {
-                        MessageBox.Show("0으로 나눌 수 없습니다.");
-                        return;
-                    }
-                    result = firstOperand / secondOperand;
-                    break;
-                default:
-                    return;
+                return;
             }
 
+            string expressionText = BuildDisplayExpression(tokensToEvaluate);
             string formattedResult = FormatNumber(result);
-            string opText = currentOperator == '*' ? "x" : currentOperator == '/' ? "÷" : currentOperator.ToString();
-            txtoutput.Text = string.Format("{0} {1} {2} = {3}", FormatNumber(firstOperand), opText, FormatNumber(secondOperand), formattedResult);
+            txtoutput.Text = string.Format("{0} = {1}", expressionText, formattedResult);
             txtinput.Text = formattedResult;
 
             if (IsRepeatedNineDigits(formattedResult))
@@ -175,10 +264,9 @@ namespace SimpleCalculator
                 MessageBox.Show("대단한 결과값이 나오셨네요!");
             }
 
-            hasFirstOperand = false;
-            currentOperator = '\0';
+            expressionTokens.Clear();
             isResultDisplayed = true;
-            isSecondOperandStarted = false;
+            isAwaitingNextValue = false;
         }
 
         private void btnDot_Click(object sender, EventArgs e)
@@ -188,16 +276,20 @@ namespace SimpleCalculator
             if (isResultDisplayed)
             {
                 txtinput.Text = "0";
+                expressionTokens.Clear();
                 isResultDisplayed = false;
+                isAwaitingNextValue = false;
+            }
+
+            if (isAwaitingNextValue)
+            {
+                txtinput.Text = "0";
+                isAwaitingNextValue = false;
             }
 
             if (!txtinput.Text.Contains("."))
             {
                 txtinput.AppendText(".");
-                if (hasFirstOperand && currentOperator != '\0')
-                {
-                    isSecondOperandStarted = true;
-                }
                 UpdateExpressionDisplay();
             }
         }
@@ -205,6 +297,12 @@ namespace SimpleCalculator
         private void btnPlusMinus_Click(object sender, EventArgs e)
         {
             ResetEqualsClickCount();
+
+            if (isAwaitingNextValue)
+            {
+                txtinput.Text = "0";
+                isAwaitingNextValue = false;
+            }
 
             if (txtinput.Text == "0")
             {
@@ -220,11 +318,6 @@ namespace SimpleCalculator
                 txtinput.Text = "-" + txtinput.Text;
             }
 
-            if (hasFirstOperand && currentOperator != '\0')
-            {
-                isSecondOperandStarted = txtinput.Text != "0";
-            }
-
             UpdateExpressionDisplay();
         }
 
@@ -235,7 +328,22 @@ namespace SimpleCalculator
             if (isResultDisplayed)
             {
                 txtinput.Text = "0";
+                expressionTokens.Clear();
                 isResultDisplayed = false;
+                isAwaitingNextValue = false;
+                UpdateExpressionDisplay();
+                return;
+            }
+
+            if (isAwaitingNextValue)
+            {
+                if (expressionTokens.Count > 0)
+                {
+                    expressionTokens.RemoveAt(expressionTokens.Count - 1);
+                }
+
+                isAwaitingNextValue = false;
+                txtinput.Text = "0";
                 UpdateExpressionDisplay();
                 return;
             }
@@ -251,11 +359,6 @@ namespace SimpleCalculator
                 txtinput.Text = "0";
             }
 
-            if (hasFirstOperand && currentOperator != '\0')
-            {
-                isSecondOperandStarted = txtinput.Text != "0";
-            }
-
             UpdateExpressionDisplay();
         }
 
@@ -264,9 +367,9 @@ namespace SimpleCalculator
             ResetEqualsClickCount();
             txtinput.Text = "0";
             isResultDisplayed = false;
-            if (hasFirstOperand && currentOperator != '\0')
+            if (!isAwaitingNextValue)
             {
-                isSecondOperandStarted = false;
+                isAwaitingNextValue = expressionTokens.Count > 0;
             }
             UpdateExpressionDisplay();
         }
@@ -276,11 +379,9 @@ namespace SimpleCalculator
             ResetEqualsClickCount();
             txtinput.Text = "0";
             txtoutput.Clear();
-            firstOperand = 0;
-            currentOperator = '\0';
-            hasFirstOperand = false;
+            expressionTokens.Clear();
             isResultDisplayed = false;
-            isSecondOperandStarted = false;
+            isAwaitingNextValue = false;
             UpdateExpressionDisplay();
         }
 
@@ -330,8 +431,16 @@ namespace SimpleCalculator
         {
             if (isResultDisplayed)
             {
+                expressionTokens.Clear();
                 txtinput.Text = "0";
                 isResultDisplayed = false;
+                isAwaitingNextValue = false;
+            }
+
+            if (isAwaitingNextValue)
+            {
+                txtinput.Text = "0";
+                isAwaitingNextValue = false;
             }
 
             string current = txtinput.Text.Replace("-", string.Empty).Replace(".", string.Empty);
@@ -348,11 +457,6 @@ namespace SimpleCalculator
             else
             {
                 txtinput.AppendText(digit);
-            }
-
-            if (hasFirstOperand && currentOperator != '\0')
-            {
-                isSecondOperandStarted = true;
             }
         }
 
@@ -404,24 +508,233 @@ namespace SimpleCalculator
             equalsClickCount = 0;
         }
 
+        private bool AppendCurrentInputToken()
+        {
+            double value;
+            if (!TryParseNumber(txtinput.Text, out value))
+            {
+                return false;
+            }
+
+            expressionTokens.Add(FormatNumber(value));
+            return true;
+        }
+
         private void UpdateExpressionDisplay()
         {
-            if (hasFirstOperand && currentOperator != '\0' && !isResultDisplayed)
+            if (expressionTokens.Count == 0)
             {
-                string opText = currentOperator == '*' ? "x" : currentOperator == '/' ? "÷" : currentOperator.ToString();
-                if (!isSecondOperandStarted)
+                txtoutput.Text = txtinput.Text;
+                return;
+            }
+
+            List<string> displayTokens = new List<string>(expressionTokens);
+            if (!isAwaitingNextValue)
+            {
+                double value;
+                if (TryParseNumber(txtinput.Text, out value))
                 {
-                    txtoutput.Text = string.Format("{0} {1}", FormatNumber(firstOperand), opText);
+                    displayTokens.Add(FormatNumber(value));
+                }
+            }
+
+            txtoutput.Text = BuildDisplayExpression(displayTokens);
+        }
+
+        private string BuildDisplayExpression(List<string> tokens)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                if (i > 0)
+                {
+                    builder.Append(' ');
+                }
+
+                string token = tokens[i];
+                if (token == "*")
+                {
+                    builder.Append("x");
+                }
+                else if (token == "/")
+                {
+                    builder.Append("÷");
                 }
                 else
                 {
-                    txtoutput.Text = string.Format("{0} {1} {2}", FormatNumber(firstOperand), opText, txtinput.Text);
+                    builder.Append(token);
                 }
+            }
+
+            return builder.ToString();
+        }
+
+        private bool IsOperatorToken(string token)
+        {
+            return token == "+" || token == "-" || token == "*" || token == "/";
+        }
+
+        private int CountOpenParentheses()
+        {
+            return CountOpenParentheses(expressionTokens);
+        }
+
+        private int CountOpenParentheses(List<string> tokens)
+        {
+            int openCount = 0;
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                if (tokens[i] == "(")
+                {
+                    openCount++;
+                }
+                else if (tokens[i] == ")")
+                {
+                    openCount--;
+                }
+            }
+
+            return openCount;
+        }
+
+        private int GetPrecedence(string op)
+        {
+            if (op == "*" || op == "/")
+            {
+                return 2;
+            }
+
+            return 1;
+        }
+
+        private bool EvaluateTokens(List<string> tokens, out double result)
+        {
+            result = 0;
+            Stack<double> values = new Stack<double>();
+            Stack<string> operators = new Stack<string>();
+
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                string token = tokens[i];
+                double number;
+                if (double.TryParse(token, NumberStyles.Float, CultureInfo.InvariantCulture, out number))
+                {
+                    values.Push(number);
+                    continue;
+                }
+
+                if (token == "(")
+                {
+                    operators.Push(token);
+                    continue;
+                }
+
+                if (token == ")")
+                {
+                    while (operators.Count > 0 && operators.Peek() != "(")
+                    {
+                        if (!ApplyTopOperation(values, operators.Pop(), out result))
+                        {
+                            return false;
+                        }
+                    }
+
+                    if (operators.Count == 0 || operators.Peek() != "(")
+                    {
+                        MessageBox.Show("괄호가 올바르지 않습니다.");
+                        return false;
+                    }
+
+                    operators.Pop();
+                    continue;
+                }
+
+                if (!IsOperatorToken(token))
+                {
+                    MessageBox.Show("수식을 확인해주세요.");
+                    return false;
+                }
+
+                while (operators.Count > 0 && operators.Peek() != "(" && GetPrecedence(operators.Peek()) >= GetPrecedence(token))
+                {
+                    if (!ApplyTopOperation(values, operators.Pop(), out result))
+                    {
+                        return false;
+                    }
+                }
+
+                operators.Push(token);
+            }
+
+            while (operators.Count > 0)
+            {
+                string op = operators.Pop();
+                if (op == "(")
+                {
+                    MessageBox.Show("괄호가 올바르지 않습니다.");
+                    return false;
+                }
+
+                if (!ApplyTopOperation(values, op, out result))
+                {
+                    return false;
+                }
+            }
+
+            if (values.Count != 1)
+            {
+                MessageBox.Show("수식을 확인해주세요.");
+                return false;
+            }
+
+            result = values.Pop();
+            return true;
+        }
+
+        private bool ApplyTopOperation(Stack<double> values, string op, out double result)
+        {
+            result = 0;
+
+            if (values.Count < 2)
+            {
+                MessageBox.Show("수식을 확인해주세요.");
+                return false;
+            }
+
+            double right = values.Pop();
+            double left = values.Pop();
+
+            if (op == "+")
+            {
+                result = left + right;
+            }
+            else if (op == "-")
+            {
+                result = left - right;
+            }
+            else if (op == "*")
+            {
+                result = left * right;
+            }
+            else if (op == "/")
+            {
+                if (right == 0)
+                {
+                    MessageBox.Show("0으로 나눌 수 없습니다.");
+                    return false;
+                }
+
+                result = left / right;
             }
             else
             {
-                txtoutput.Text = txtinput.Text;
+                MessageBox.Show("수식을 확인해주세요.");
+                return false;
             }
+
+            values.Push(result);
+            return true;
         }
     }
 }
