@@ -61,7 +61,7 @@
             this.txtinput.ReadOnly = true;
             this.txtinput.Size = new System.Drawing.Size(340, 42);
             this.txtinput.TabIndex = 1;
-            this.txtinput.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtinput.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
             // 
             // txtoutput
             // 
@@ -71,7 +71,7 @@
             this.txtoutput.ReadOnly = true;
             this.txtoutput.Size = new System.Drawing.Size(340, 42);
             this.txtoutput.TabIndex = 0;
-            this.txtoutput.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtoutput.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
             // 
             // button1
             // 
