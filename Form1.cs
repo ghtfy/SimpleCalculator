@@ -15,6 +15,7 @@ namespace SimpleCalculator
         private char currentOperator = '\0';
         private bool hasFirstOperand;
         private bool isResultDisplayed;
+        private bool isSecondOperandStarted;
 
         public Form1()
         {
@@ -62,6 +63,7 @@ namespace SimpleCalculator
             }
 
             AppendDigit(button.Text);
+            UpdateExpressionDisplay();
         }
 
         private void OperatorButton_Click(object sender, EventArgs e)
@@ -104,8 +106,9 @@ namespace SimpleCalculator
                     break;
             }
 
-            txtoutput.Text = string.Format("{0} {1}", FormatNumber(firstOperand), button.Text);
             txtinput.Text = "0";
+            isSecondOperandStarted = false;
+            UpdateExpressionDisplay();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -122,6 +125,7 @@ namespace SimpleCalculator
                 hasFirstOperand = false;
                 currentOperator = '\0';
                 isResultDisplayed = true;
+                isSecondOperandStarted = false;
                 return;
             }
 
@@ -174,6 +178,7 @@ namespace SimpleCalculator
             hasFirstOperand = false;
             currentOperator = '\0';
             isResultDisplayed = true;
+            isSecondOperandStarted = false;
         }
 
         private void btnDot_Click(object sender, EventArgs e)
@@ -189,6 +194,11 @@ namespace SimpleCalculator
             if (!txtinput.Text.Contains("."))
             {
                 txtinput.AppendText(".");
+                if (hasFirstOperand && currentOperator != '\0')
+                {
+                    isSecondOperandStarted = true;
+                }
+                UpdateExpressionDisplay();
             }
         }
 
@@ -209,6 +219,13 @@ namespace SimpleCalculator
             {
                 txtinput.Text = "-" + txtinput.Text;
             }
+
+            if (hasFirstOperand && currentOperator != '\0')
+            {
+                isSecondOperandStarted = txtinput.Text != "0";
+            }
+
+            UpdateExpressionDisplay();
         }
 
         private void btnDel_Click(object sender, EventArgs e)
@@ -219,6 +236,7 @@ namespace SimpleCalculator
             {
                 txtinput.Text = "0";
                 isResultDisplayed = false;
+                UpdateExpressionDisplay();
                 return;
             }
 
@@ -232,6 +250,13 @@ namespace SimpleCalculator
             {
                 txtinput.Text = "0";
             }
+
+            if (hasFirstOperand && currentOperator != '\0')
+            {
+                isSecondOperandStarted = txtinput.Text != "0";
+            }
+
+            UpdateExpressionDisplay();
         }
 
         private void btnCE_Click(object sender, EventArgs e)
@@ -239,6 +264,11 @@ namespace SimpleCalculator
             ResetEqualsClickCount();
             txtinput.Text = "0";
             isResultDisplayed = false;
+            if (hasFirstOperand && currentOperator != '\0')
+            {
+                isSecondOperandStarted = false;
+            }
+            UpdateExpressionDisplay();
         }
 
         private void btnC_Click(object sender, EventArgs e)
@@ -250,6 +280,8 @@ namespace SimpleCalculator
             currentOperator = '\0';
             hasFirstOperand = false;
             isResultDisplayed = false;
+            isSecondOperandStarted = false;
+            UpdateExpressionDisplay();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -317,6 +349,11 @@ namespace SimpleCalculator
             {
                 txtinput.AppendText(digit);
             }
+
+            if (hasFirstOperand && currentOperator != '\0')
+            {
+                isSecondOperandStarted = true;
+            }
         }
 
         private bool TryParseNumber(string text, out double value)
@@ -365,6 +402,26 @@ namespace SimpleCalculator
         private void ResetEqualsClickCount()
         {
             equalsClickCount = 0;
+        }
+
+        private void UpdateExpressionDisplay()
+        {
+            if (hasFirstOperand && currentOperator != '\0' && !isResultDisplayed)
+            {
+                string opText = currentOperator == '*' ? "x" : currentOperator == '/' ? "÷" : currentOperator.ToString();
+                if (!isSecondOperandStarted)
+                {
+                    txtoutput.Text = string.Format("{0} {1}", FormatNumber(firstOperand), opText);
+                }
+                else
+                {
+                    txtoutput.Text = string.Format("{0} {1} {2}", FormatNumber(firstOperand), opText, txtinput.Text);
+                }
+            }
+            else
+            {
+                txtoutput.Text = txtinput.Text;
+            }
         }
     }
 }
