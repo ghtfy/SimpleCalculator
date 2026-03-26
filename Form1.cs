@@ -6,6 +6,8 @@ namespace SimpleCalculator
 {
     public partial class Form1 : Form
     {
+        private const int MaxDigitCount = 16;
+
         private double firstOperand;
         private char currentOperator = '\0';
         private bool hasFirstOperand;
@@ -15,6 +17,8 @@ namespace SimpleCalculator
         {
             InitializeComponent();
             txtinput.Text = "0";
+            KeyPreview = true;
+            KeyDown += Form1_KeyDown;
             WireEvents();
         }
 
@@ -52,20 +56,7 @@ namespace SimpleCalculator
                 return;
             }
 
-            if (isResultDisplayed)
-            {
-                txtinput.Text = "0";
-                isResultDisplayed = false;
-            }
-
-            if (txtinput.Text == "0")
-            {
-                txtinput.Text = button.Text;
-            }
-            else
-            {
-                txtinput.AppendText(button.Text);
-            }
+            AppendDigit(button.Text);
         }
 
         private void OperatorButton_Click(object sender, EventArgs e)
@@ -148,9 +139,15 @@ namespace SimpleCalculator
                     return;
             }
 
+            string formattedResult = FormatNumber(result);
             string opText = currentOperator == '*' ? "x" : currentOperator == '/' ? "÷" : currentOperator.ToString();
-            txtoutput.Text = string.Format("{0} {1} {2} = {3}", FormatNumber(firstOperand), opText, FormatNumber(secondOperand), FormatNumber(result));
-            txtinput.Text = FormatNumber(result);
+            txtoutput.Text = string.Format("{0} {1} {2} = {3}", FormatNumber(firstOperand), opText, FormatNumber(secondOperand), formattedResult);
+            txtinput.Text = formattedResult;
+
+            if (IsRepeatedNineDigits(formattedResult))
+            {
+                MessageBox.Show("대단한 결과값이 나오셨네요!");
+            }
 
             hasFirstOperand = false;
             currentOperator = '\0';
@@ -225,6 +222,73 @@ namespace SimpleCalculator
             isResultDisplayed = false;
         }
 
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9)
+            {
+                AppendDigit(((int)(e.KeyCode - Keys.D0)).ToString());
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+                return;
+            }
+
+            if (e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9)
+            {
+                AppendDigit(((int)(e.KeyCode - Keys.NumPad0)).ToString());
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+                return;
+            }
+
+            if (e.KeyCode == Keys.Delete)
+            {
+                btnCE_Click(btnCE, EventArgs.Empty);
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+                return;
+            }
+
+            if (e.KeyCode == Keys.Escape)
+            {
+                btnC_Click(btnC, EventArgs.Empty);
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+                return;
+            }
+
+            if (e.KeyCode == Keys.Back)
+            {
+                btnDel_Click(btnDel, EventArgs.Empty);
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+        }
+
+        private void AppendDigit(string digit)
+        {
+            if (isResultDisplayed)
+            {
+                txtinput.Text = "0";
+                isResultDisplayed = false;
+            }
+
+            string current = txtinput.Text.Replace("-", string.Empty).Replace(".", string.Empty);
+            if (current.Length >= MaxDigitCount)
+            {
+                MessageBox.Show("그만 누르세요");
+                return;
+            }
+
+            if (txtinput.Text == "0")
+            {
+                txtinput.Text = digit;
+            }
+            else
+            {
+                txtinput.AppendText(digit);
+            }
+        }
+
         private bool TryParseNumber(string text, out double value)
         {
             if (double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out value))
@@ -238,6 +302,30 @@ namespace SimpleCalculator
         private string FormatNumber(double value)
         {
             return value.ToString("0.############", CultureInfo.InvariantCulture);
+        }
+
+        private bool IsRepeatedNineDigits(string value)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length != 9)
+            {
+                return false;
+            }
+
+            char first = value[0];
+            if (!char.IsDigit(first))
+            {
+                return false;
+            }
+
+            for (int i = 1; i < value.Length; i++)
+            {
+                if (value[i] != first)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void label1_Click(object sender, EventArgs e)
