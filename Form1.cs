@@ -190,6 +190,13 @@ namespace SimpleCalculator
 
         private void btnDel_Click(object sender, EventArgs e)
         {
+            if (isResultDisplayed)
+            {
+                txtinput.Text = "0";
+                isResultDisplayed = false;
+                return;
+            }
+
             if (string.IsNullOrEmpty(txtinput.Text) || txtinput.Text == "0")
             {
                 return;
@@ -205,6 +212,7 @@ namespace SimpleCalculator
         private void btnCE_Click(object sender, EventArgs e)
         {
             txtinput.Text = "0";
+            isResultDisplayed = false;
         }
 
         private void btnC_Click(object sender, EventArgs e)

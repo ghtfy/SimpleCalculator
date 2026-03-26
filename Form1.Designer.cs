@@ -31,7 +31,7 @@
             this.txtinput = new System.Windows.Forms.TextBox();
             this.txtoutput = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblAppname = new System.Windows.Forms.Label();
             this.btnCE = new System.Windows.Forms.Button();
             this.btnC = new System.Windows.Forms.Button();
             this.btnDel = new System.Windows.Forms.Button();
@@ -56,7 +56,7 @@
             // txtinput
             // 
             this.txtinput.Font = new System.Drawing.Font("굴림", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.txtinput.Location = new System.Drawing.Point(20, 101);
+            this.txtinput.Location = new System.Drawing.Point(20, 136);
             this.txtinput.Name = "txtinput";
             this.txtinput.ReadOnly = true;
             this.txtinput.Size = new System.Drawing.Size(340, 42);
@@ -66,7 +66,7 @@
             // txtoutput
             // 
             this.txtoutput.Font = new System.Drawing.Font("굴림", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.txtoutput.Location = new System.Drawing.Point(20, 49);
+            this.txtoutput.Location = new System.Drawing.Point(20, 88);
             this.txtoutput.Name = "txtoutput";
             this.txtoutput.ReadOnly = true;
             this.txtoutput.Size = new System.Drawing.Size(340, 42);
@@ -76,27 +76,29 @@
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("굴림", 16F, System.Drawing.FontStyle.Bold);
-            this.button1.Location = new System.Drawing.Point(280, 379);
+            this.button1.Location = new System.Drawing.Point(280, 400);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(80, 48);
             this.button1.TabIndex = 22;
             this.button1.Text = "=";
             this.button1.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // lblAppname
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(0, 15);
-            this.label1.TabIndex = 23;
-            this.label1.Visible = false;
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.lblAppname.AutoSize = true;
+            this.lblAppname.Font = new System.Drawing.Font("굴림", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.lblAppname.ForeColor = System.Drawing.Color.Blue;
+            this.lblAppname.Location = new System.Drawing.Point(12, 23);
+            this.lblAppname.Name = "lblAppname";
+            this.lblAppname.Size = new System.Drawing.Size(344, 40);
+            this.lblAppname.TabIndex = 23;
+            this.lblAppname.Text = "Simple Calculator";
+            this.lblAppname.Click += new System.EventHandler(this.label1_Click);
             // 
             // btnCE
             // 
             this.btnCE.Font = new System.Drawing.Font("굴림", 14F);
-            this.btnCE.Location = new System.Drawing.Point(20, 152);
+            this.btnCE.Location = new System.Drawing.Point(20, 184);
             this.btnCE.Name = "btnCE";
             this.btnCE.Size = new System.Drawing.Size(80, 48);
             this.btnCE.TabIndex = 2;
@@ -106,7 +108,7 @@
             // btnC
             // 
             this.btnC.Font = new System.Drawing.Font("굴림", 14F);
-            this.btnC.Location = new System.Drawing.Point(106, 152);
+            this.btnC.Location = new System.Drawing.Point(106, 184);
             this.btnC.Name = "btnC";
             this.btnC.Size = new System.Drawing.Size(80, 48);
             this.btnC.TabIndex = 3;
@@ -116,7 +118,7 @@
             // btnDel
             // 
             this.btnDel.Font = new System.Drawing.Font("굴림", 14F);
-            this.btnDel.Location = new System.Drawing.Point(192, 152);
+            this.btnDel.Location = new System.Drawing.Point(192, 184);
             this.btnDel.Name = "btnDel";
             this.btnDel.Size = new System.Drawing.Size(80, 48);
             this.btnDel.TabIndex = 4;
@@ -127,7 +129,7 @@
             // 
             this.btnDivide.Font = new System.Drawing.Font("굴림", 14F);
             this.btnDivide.ForeColor = System.Drawing.Color.Red;
-            this.btnDivide.Location = new System.Drawing.Point(278, 152);
+            this.btnDivide.Location = new System.Drawing.Point(278, 184);
             this.btnDivide.Name = "btnDivide";
             this.btnDivide.Size = new System.Drawing.Size(80, 48);
             this.btnDivide.TabIndex = 5;
@@ -138,7 +140,7 @@
             // 
             this.btnNum7.Font = new System.Drawing.Font("굴림", 14F);
             this.btnNum7.ForeColor = System.Drawing.Color.Blue;
-            this.btnNum7.Location = new System.Drawing.Point(20, 206);
+            this.btnNum7.Location = new System.Drawing.Point(20, 238);
             this.btnNum7.Name = "btnNum7";
             this.btnNum7.Size = new System.Drawing.Size(80, 48);
             this.btnNum7.TabIndex = 6;
@@ -149,7 +151,7 @@
             // 
             this.btnNum8.Font = new System.Drawing.Font("굴림", 14F);
             this.btnNum8.ForeColor = System.Drawing.Color.Blue;
-            this.btnNum8.Location = new System.Drawing.Point(106, 206);
+            this.btnNum8.Location = new System.Drawing.Point(106, 238);
             this.btnNum8.Name = "btnNum8";
             this.btnNum8.Size = new System.Drawing.Size(80, 48);
             this.btnNum8.TabIndex = 7;
@@ -160,7 +162,7 @@
             // 
             this.btnNum9.Font = new System.Drawing.Font("굴림", 14F);
             this.btnNum9.ForeColor = System.Drawing.Color.Blue;
-            this.btnNum9.Location = new System.Drawing.Point(192, 206);
+            this.btnNum9.Location = new System.Drawing.Point(192, 238);
             this.btnNum9.Name = "btnNum9";
             this.btnNum9.Size = new System.Drawing.Size(80, 48);
             this.btnNum9.TabIndex = 8;
@@ -171,7 +173,7 @@
             // 
             this.btnMultiply.Font = new System.Drawing.Font("굴림", 14F);
             this.btnMultiply.ForeColor = System.Drawing.Color.Red;
-            this.btnMultiply.Location = new System.Drawing.Point(278, 206);
+            this.btnMultiply.Location = new System.Drawing.Point(278, 238);
             this.btnMultiply.Name = "btnMultiply";
             this.btnMultiply.Size = new System.Drawing.Size(80, 48);
             this.btnMultiply.TabIndex = 9;
@@ -182,7 +184,7 @@
             // 
             this.btnNum4.Font = new System.Drawing.Font("굴림", 14F);
             this.btnNum4.ForeColor = System.Drawing.Color.Blue;
-            this.btnNum4.Location = new System.Drawing.Point(20, 260);
+            this.btnNum4.Location = new System.Drawing.Point(20, 292);
             this.btnNum4.Name = "btnNum4";
             this.btnNum4.Size = new System.Drawing.Size(80, 48);
             this.btnNum4.TabIndex = 10;
@@ -193,7 +195,7 @@
             // 
             this.btnNum5.Font = new System.Drawing.Font("굴림", 14F);
             this.btnNum5.ForeColor = System.Drawing.Color.Blue;
-            this.btnNum5.Location = new System.Drawing.Point(106, 260);
+            this.btnNum5.Location = new System.Drawing.Point(106, 292);
             this.btnNum5.Name = "btnNum5";
             this.btnNum5.Size = new System.Drawing.Size(80, 48);
             this.btnNum5.TabIndex = 11;
@@ -204,7 +206,7 @@
             // 
             this.btnNum6.Font = new System.Drawing.Font("굴림", 14F);
             this.btnNum6.ForeColor = System.Drawing.Color.Blue;
-            this.btnNum6.Location = new System.Drawing.Point(192, 260);
+            this.btnNum6.Location = new System.Drawing.Point(192, 292);
             this.btnNum6.Name = "btnNum6";
             this.btnNum6.Size = new System.Drawing.Size(80, 48);
             this.btnNum6.TabIndex = 12;
@@ -215,7 +217,7 @@
             // 
             this.btnSubtract.Font = new System.Drawing.Font("굴림", 14F);
             this.btnSubtract.ForeColor = System.Drawing.Color.Red;
-            this.btnSubtract.Location = new System.Drawing.Point(278, 260);
+            this.btnSubtract.Location = new System.Drawing.Point(278, 292);
             this.btnSubtract.Name = "btnSubtract";
             this.btnSubtract.Size = new System.Drawing.Size(80, 48);
             this.btnSubtract.TabIndex = 13;
@@ -226,7 +228,7 @@
             // 
             this.btnNum1.Font = new System.Drawing.Font("굴림", 14F);
             this.btnNum1.ForeColor = System.Drawing.Color.Blue;
-            this.btnNum1.Location = new System.Drawing.Point(20, 314);
+            this.btnNum1.Location = new System.Drawing.Point(20, 346);
             this.btnNum1.Name = "btnNum1";
             this.btnNum1.Size = new System.Drawing.Size(80, 48);
             this.btnNum1.TabIndex = 14;
@@ -237,7 +239,7 @@
             // 
             this.btnNum2.Font = new System.Drawing.Font("굴림", 14F);
             this.btnNum2.ForeColor = System.Drawing.Color.Blue;
-            this.btnNum2.Location = new System.Drawing.Point(106, 314);
+            this.btnNum2.Location = new System.Drawing.Point(106, 346);
             this.btnNum2.Name = "btnNum2";
             this.btnNum2.Size = new System.Drawing.Size(80, 48);
             this.btnNum2.TabIndex = 15;
@@ -248,7 +250,7 @@
             // 
             this.btnNum3.Font = new System.Drawing.Font("굴림", 14F);
             this.btnNum3.ForeColor = System.Drawing.Color.Blue;
-            this.btnNum3.Location = new System.Drawing.Point(192, 314);
+            this.btnNum3.Location = new System.Drawing.Point(192, 346);
             this.btnNum3.Name = "btnNum3";
             this.btnNum3.Size = new System.Drawing.Size(80, 48);
             this.btnNum3.TabIndex = 16;
@@ -259,7 +261,7 @@
             // 
             this.btnAdd.Font = new System.Drawing.Font("굴림", 14F);
             this.btnAdd.ForeColor = System.Drawing.Color.Red;
-            this.btnAdd.Location = new System.Drawing.Point(280, 314);
+            this.btnAdd.Location = new System.Drawing.Point(280, 346);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(80, 48);
             this.btnAdd.TabIndex = 17;
@@ -269,7 +271,7 @@
             // btnPlusMinus
             // 
             this.btnPlusMinus.Font = new System.Drawing.Font("굴림", 14F);
-            this.btnPlusMinus.Location = new System.Drawing.Point(20, 380);
+            this.btnPlusMinus.Location = new System.Drawing.Point(20, 400);
             this.btnPlusMinus.Name = "btnPlusMinus";
             this.btnPlusMinus.Size = new System.Drawing.Size(80, 48);
             this.btnPlusMinus.TabIndex = 18;
@@ -280,7 +282,7 @@
             // 
             this.btnNum0.Font = new System.Drawing.Font("굴림", 14F);
             this.btnNum0.ForeColor = System.Drawing.Color.Blue;
-            this.btnNum0.Location = new System.Drawing.Point(106, 380);
+            this.btnNum0.Location = new System.Drawing.Point(106, 400);
             this.btnNum0.Name = "btnNum0";
             this.btnNum0.Size = new System.Drawing.Size(80, 48);
             this.btnNum0.TabIndex = 19;
@@ -290,7 +292,7 @@
             // btnDot
             // 
             this.btnDot.Font = new System.Drawing.Font("굴림", 14F);
-            this.btnDot.Location = new System.Drawing.Point(192, 380);
+            this.btnDot.Location = new System.Drawing.Point(192, 400);
             this.btnDot.Name = "btnDot";
             this.btnDot.Size = new System.Drawing.Size(80, 48);
             this.btnDot.TabIndex = 20;
@@ -321,7 +323,7 @@
             this.Controls.Add(this.btnDel);
             this.Controls.Add(this.btnC);
             this.Controls.Add(this.btnCE);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lblAppname);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.txtoutput);
             this.Controls.Add(this.txtinput);
@@ -338,7 +340,7 @@
         private System.Windows.Forms.TextBox txtinput;
         private System.Windows.Forms.TextBox txtoutput;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblAppname;
         private System.Windows.Forms.Button btnCE;
         private System.Windows.Forms.Button btnC;
         private System.Windows.Forms.Button btnDel;
