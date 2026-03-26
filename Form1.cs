@@ -8,6 +8,9 @@ namespace SimpleCalculator
     {
         private const int MaxDigitCount = 16;
 
+        private readonly Random random = new Random();
+        private int equalsClickCount;
+
         private double firstOperand;
         private char currentOperator = '\0';
         private bool hasFirstOperand;
@@ -50,6 +53,8 @@ namespace SimpleCalculator
 
         private void NumberButton_Click(object sender, EventArgs e)
         {
+            ResetEqualsClickCount();
+
             Button button = sender as Button;
             if (button == null)
             {
@@ -61,6 +66,8 @@ namespace SimpleCalculator
 
         private void OperatorButton_Click(object sender, EventArgs e)
         {
+            ResetEqualsClickCount();
+
             Button button = sender as Button;
             if (button == null)
             {
@@ -103,6 +110,21 @@ namespace SimpleCalculator
 
         private void button1_Click(object sender, EventArgs e)
         {
+            equalsClickCount++;
+            if (equalsClickCount >= 3)
+            {
+                int randomNumber = random.Next(1, 101);
+                txtoutput.Text = "랜덤 숫자 생성";
+                txtinput.Text = randomNumber.ToString();
+                MessageBox.Show(string.Format("랜덤 숫자: {0}", randomNumber));
+
+                equalsClickCount = 0;
+                hasFirstOperand = false;
+                currentOperator = '\0';
+                isResultDisplayed = true;
+                return;
+            }
+
             if (!hasFirstOperand || currentOperator == '\0')
             {
                 return;
@@ -156,6 +178,8 @@ namespace SimpleCalculator
 
         private void btnDot_Click(object sender, EventArgs e)
         {
+            ResetEqualsClickCount();
+
             if (isResultDisplayed)
             {
                 txtinput.Text = "0";
@@ -170,6 +194,8 @@ namespace SimpleCalculator
 
         private void btnPlusMinus_Click(object sender, EventArgs e)
         {
+            ResetEqualsClickCount();
+
             if (txtinput.Text == "0")
             {
                 return;
@@ -187,6 +213,8 @@ namespace SimpleCalculator
 
         private void btnDel_Click(object sender, EventArgs e)
         {
+            ResetEqualsClickCount();
+
             if (isResultDisplayed)
             {
                 txtinput.Text = "0";
@@ -208,12 +236,14 @@ namespace SimpleCalculator
 
         private void btnCE_Click(object sender, EventArgs e)
         {
+            ResetEqualsClickCount();
             txtinput.Text = "0";
             isResultDisplayed = false;
         }
 
         private void btnC_Click(object sender, EventArgs e)
         {
+            ResetEqualsClickCount();
             txtinput.Text = "0";
             txtoutput.Clear();
             firstOperand = 0;
@@ -330,6 +360,11 @@ namespace SimpleCalculator
 
         private void label1_Click(object sender, EventArgs e)
         {
+        }
+
+        private void ResetEqualsClickCount()
+        {
+            equalsClickCount = 0;
         }
     }
 }
